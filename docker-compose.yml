@@ -1,0 +1,50 @@
+version: '2'
+
+services:
+  elasticsearch:
+    build: elasticsearch
+    container_name: rb.elasticsearch
+    ports:
+      - "9200:9200" # transport port
+      - "9300:9300" # http port
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - cluster.name=rb.elasticsearch
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 1g
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  logstash:
+    build: logstash
+    container_name: rb.logstash
+    ports:
+      - "9600:9600" # http port
+    depends_on:
+      - elasticsearch
+      - rabbitmq
+    volumes:
+      - ./logstash/config/:/usr/share/logstash/config/
+      - ./logstash/pipeline/:/usr/share/logstash/pipeline/
+
+  rabbitmq:
+    build: rabbitmq
+    container_name: rb.rabbitmq
+    ports:
+      - "4369:4369"   # peer discovery
+      - "5671:5671"   # AMQPS
+      - "5672:5672"   # AMQP
+      - "15672:15672" # WEB
+    volumes:
+      - ./rabbitmq/config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./rabbitmq/config/definitions.json:/etc/rabbitmq/definitions.json
+volumes:
+  esdata:
+    driver: local
+
+

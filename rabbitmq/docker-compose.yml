@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  rabbitmq:
+    build: .
+    container_name: rb-i.rabbitmq
+    ports:
+      - "4369:4369"   # peer discovery
+      - "5671:5671"   # AMQPS
+      - "5672:5672"   # AMQP
+      - "15672:15672" # WEB
+    volumes:
+      - ./rabbitmq/config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./rabbitmq/config/definitions.json:/etc/rabbitmq/definitions.json

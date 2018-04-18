@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  logstash:
+    build: .
+    container_name: rb-i.logstash
+    ports:
+      - "9600:9600" # http port
+    depends_on:
+      - elasticsearch
+      - rabbitmq
+    volumes:
+      - ./logstash/config/:/usr/share/logstash/config/
+      - ./logstash/pipeline/:/usr/share/logstash/pipeline/
